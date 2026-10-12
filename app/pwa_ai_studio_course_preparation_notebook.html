@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Studio AI & Notebook Pelajaran</title>
+    <!-- PWA Primary Meta Tags -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Aplikasi Notebook Pelajaran Interaktif & AI Studio PWA yang aman dan dapat dipasang di HP / Laptop.">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AIBookPWA">
+    <link rel="manifest" href="./manifest.json">
+    <!-- Optional: Apple touch icon (use a hosted icon or add to repo) -->
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3426/3426653.png">
+    
+    <!-- Inline Dynamic PWA Manifest Generator (kept for backward compatibility) -->
+    <script>
+        (function() {
+            // If an external manifest is present, prefer it. This inline generator is kept as a fallback.
+            if (document.querySelector('link[rel="manifest"]')) return;
+            const manifest = {
+                "name": "PWA Studio AI & Notebook Pelajaran",
+                "short_name": "AIBookPWA",
+                "start_url": "./",
+                "display": "standalone",
+                "background_color": "#020617",
+                "theme_color": "#4f46e5",
+                "description": "Notebook Persiapan Kelas & Studio AI PWA Interaktif",
+                "icons": [
+                    {
+                        "src": "https://cdn-icons-png.flaticon.com/512/3426/3426653.png",
+                        "sizes": "192x192",
+                        "type": "image/png",
+                        "purpose": "any maskable"
+                    },
+                    {
+                        "src": "https://cdn-icons-png.flaticon.com/512/3426/3426653.png",
+                        "sizes": "512x512",
+                        "type": "image/png",
+                        "purpose": "any maskable"
+                    }
+                ]
+            };
+            const stringManifest = JSON.stringify(manifest);
+            const blob = new Blob([stringManifest], {type: 'application/json'});
+            const manifestURL = URL.createObjectURL(blob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestURL;
+            document.head.appendChild(link);
+        })();
+    </script>
+
+    <!-- Tailwind CSS & Puter.js & FontAwesome Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.puter.com/v2/"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        code, pre { font-family: 'Fira Code', monospace; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .pulse-subtle { animation: pulseSlow 3s infinite; }
+        @keyframes pulseSlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-graduation-cap text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg text-white leading-tight flex items-center gap-2">
+                        PWA Studio & Notebook Pelajaran
+                        <span id="securityBadge" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800/60">
+                            <i class="fa-solid fa-shield-halved mr-1"></i> Aman (HTTPS/PWA)
+                        </span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Siap Dipasang & Digunakan Offline / Online</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Status Offline/Online -->
+                <span id="connectionStatus" class="hidden sm:flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Online
+                </span>
+
+                <!-- Tombol Install PWA -->
+                <button id="pwaInstallBtn" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition-all shadow-lg flex items-center gap-1.5 pulse-subtle">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Pasang Aplikasi</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+        
+        <!-- Tab Navigasi Fitur -->
+        <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-2">
+            <button onclick="switchTab('notebook')" id="tab-notebook" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition-all shadow flex items-center gap-1.5">
+                <i class="fa-solid fa-book-open"></i> Notebook Pelajaran
+            </button>
+            <button onclick="switchTab('puter')" id="tab-puter" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold bg-slate-900 text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-cloud"></i> Puter AI Chat
+            </button>
+            <button onclick="switchTab('gemini-text')" id="tab-gemini-text" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold bg-slate-900 text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-brain"></i> Gemini Search
+            </button>
+            <button onclick="switchTab('gemini-json')" id="tab-gemini-json" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold bg-slate-900 text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-code"></i> Structured JSON
+            </button>
+            <button onclick="switchTab('gemini-vision')" id="tab-gemini-vision" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold bg-slate-900 text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-image"></i> Image Analysis
+            </button>
+            <button onclick="switchTab('gemini-tts')" id="tab-gemini-tts" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold bg-slate-900 text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-volume-high"></i> Text-to-Speech
+            </button>
+            <button onclick="switchTab('gemini-image-gen')" id="tab-gemini-image-gen" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold bg-slate-900 text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Image Gen / Edit
+            </button>
+        </div>
+
+        <div id="panel-notebook" class="query-panel space-y-4">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square"></i> Buat Modul / Notebook Persiapan Kelas
+                    </h2>
+                    <span class="text-xs text-slate-400 bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800">
+                        Keamanan Input Terenkapsulasi
+                    </span>
+                </div>
+                <p class="text-xs text-slate-400 mb-4">
+                    Masukkan topik pelajaran, silabus, atau poin materi untuk menghasilkan ringkasan pembelajaran, peta konsep, dan kuis uji pemahaman.
+                </p>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Mata Kuliah / Topik Pelajaran:</label>
+                        <input type="text" id="courseTopic" value="Kecerdasan Buatan & Pemrograman Web PWA" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 font-sans">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Silabus / Poin-poin Materi dari Pengajar:</label>
+                        <textarea id="courseSyllabus" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 custom-scrollbar font-mono">1. Pengenalan PWA & Service Worker
+2. Keamanan Aplikasi Web (Input Sanitization & Dynamic Origin Check)
+3. Integrasi AI Gemini REST API & Model Generatif
+4. Penyimpanan Lokal Terstruktur</textarea>
+                    </div>
+                </div>
+                <div class="mt-4 flex flex-wrap gap-2 justify-end">
+                    <button onclick="generateNotebook('summary')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all shadow flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-lines"></i> Ringkasan & Peta Konsep
+                    </button>
+                    <button onclick="generateNotebook('quiz')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all shadow flex items-center gap-1.5">
+                        <i class="fa-solid fa-list-check"></i> Buat Kuis Pemahaman
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Puter AI Chat -->
+        <div id="panel-puter" class="query-panel space-y-4 hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">Puter AI Chat Request</h2>
+                <textarea id="promptInputPuter" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 custom-scrollbar font-mono">Jelaskan cara kerja Progressive Web App (PWA) dan keunggulannya.</textarea>
+                
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-4 text-xs text-slate-400">
+                        <div class="flex items-center gap-1.5">
+                            <i class="fa-solid fa-microchip text-indigo-400"></i> Model: 
+                            <select id="modelSelectPuter" class="bg-slate-950 text-indigo-300 border border-slate-700 rounded px-2 py-1 focus:outline-none focus:border-indigo-500">
+                                <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+                                <option value="gemini-3.7-flash">gemini-3.7-flash</option>
+                                <option value="gemini-3-flash-preview" selected>gemini-3-flash-preview</option>
+                            </select>
+                        </div>
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <input type="checkbox" id="streamToggle" checked class="rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-indigo-500">
+                            <span>Stream Response</span>
+                        </label>
+                    </div>
+                    <button onclick="runPuterQuery()" id="submitBtnPuter" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-5 py-2.5 rounded-lg transition-all shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-play"></i> Jalankan Puter Query
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gemini Standard / Search Panel -->
+        <div id="panel-gemini-text" class="query-panel space-y-4 hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">Gemini API (Google Search Grounding)</h2>
+                <textarea id="promptInputGemini" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 custom-scrollbar font-mono">Apa saja perkembangan terbaru teknologi web pwa di tahun ini?</textarea>
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-400">
+                        <input type="checkbox" id="searchGroundingToggle" checked class="rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-indigo-500">
+                        <span>Aktifkan Google Search Grounding</span>
+                    </label>
+                    <button onclick="runGeminiTextQuery()" id="submitBtnGemini" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-5 py-2.5 rounded-lg transition-all shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Jalankan Gemini Search
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gemini Structured JSON Panel -->
+        <div id="panel-gemini-json" class="query-panel space-y-4 hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">Gemini Structured JSON Output</h2>
+                <textarea id="promptInputJson" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 custom-scrollbar font-mono">Berikan 3 topik penting persiapan ujian web security.</textarea>
+                <div class="flex justify-end">
+                    <button onclick="runGeminiJsonQuery()" id="submitBtnJson" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-5 py-2.5 rounded-lg transition-all shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-file-code"></i> Generate JSON
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gemini Vision Panel -->
+        <div id="panel-gemini-vision" class="query-panel space-y-4 hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">Gemini Multi-modal Image Analysis</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-3">
+                        <textarea id="promptInputVision" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 custom-scrollbar font-mono">Analisis gambar berikut ini:</textarea>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">URL Gambar (Opsional):</label>
+                            <input type="text" id="imageUrlInput" value="https://assets.puter.site/doge.jpeg" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-mono">
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <input type="file" id="imageFileInput" accept="image/*" class="text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-950 file:text-indigo-300 hover:file:bg-indigo-900">
+                        <div id="imagePreviewContainer" class="bg-slate-950 border border-slate-800 rounded-lg h-32 flex items-center justify-center text-xs text-slate-500 overflow-hidden">
+                            <img src="https://assets.puter.site/doge.jpeg" class="h-full object-contain rounded">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button onclick="runGeminiVisionQuery()" id="submitBtnVision" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold px-5 py-2.5 rounded-lg transition-all shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-eye"></i> Analisis Gambar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gemini TTS Panel -->
+        <div id="panel-gemini-tts" class="query-panel space-y-4 hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">Text-to-Speech Audio Converter</h2>
+                <textarea id="promptInputTts" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 custom-scrollbar font-mono">Selamat datang di aplikasi Notebook Pelajaran PWA yang aman dan responsif.</textarea>
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-2 text-xs text-slate-400">
+                        <span>Suara:</span>
+                        <select id="voiceSelect" class="bg-slate-950 text-indigo-300 border border-slate-700 rounded px-2 py-1 focus:outline-none">
+                            <option value="Zephyr">Zephyr (Cerah)</option>
+                            <option value="Puck">Puck (Semangat)</option>
+                            <option value="Kore">Kore (Tegas)</option>
+                        </select>
+                    </div>
+                    <button onclick="runGeminiTtsQuery()" id="submitBtnTts" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold px-5 py-2.5 rounded-lg transition-all shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-volume-high"></i> Sintesis Suara
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gemini Image Gen Panel -->
+        <div id="panel-gemini-image-gen" class="query-panel space-y-4 hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">Gemini Image Generation</h2>
+                <textarea id="promptInputImageGen" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 custom-scrollbar font-mono">Infografis berwarna tentang arsitektur keamanan web PWA</textarea>
+                <div class="flex justify-end">
+                    <button onclick="runGeminiImageGenQuery()" id="submitBtnImageGen" class="bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold px-5 py-2.5 rounded-lg transition-all shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Gambar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl flex-1 flex flex-col min-h-[300px]">
+            <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-terminal text-indigo-400"></i> Hasil Output / Catatan
+                </h2>
+                <button onclick="clearOutput()" class="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                    <i class="fa-solid fa-trash-can mr-1"></i> Bersihkan
+                </button>
+            </div>
+            
+            <div id="outputContainer" class="bg-slate-950 border border-slate-800/80 rounded-lg p-4 flex-1 overflow-y-auto custom-scrollbar text-sm text-indigo-200 whitespace-pre-wrap leading-relaxed">
+                Silakan pilih alat di atas atau gunakan Notebook Pelajaran untuk menghasilkan materi persiapan kelas...
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- 1. SCRIPT KEAMANAN & SANITASI INPUT ---
+        function sanitizeText(str) {
+            if (!str) return '';
+            const temp = document.createElement('div');
+            temp.textContent = str;
+            return temp.innerHTML;
+        }
+
+        // --- 2. REGISTRASI SERVICE WORKER PWA (OFFLINE CAPABILITY) ---
+        // Register external service worker (preferred) instead of creating one from blob.
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('ServiceWorker registered.', reg))
+                    .catch(err => console.warn('ServiceWorker registration failed:', err));
+            });
+        }
+
+        // --- 3. LOGIKA PEMASANGAN APLIKASI (PWA INSTALL PROMPT) ---
+        let deferredPrompt = null;
+        const installBtn = document.getElementById('pwaInstallBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBtn) installBtn.classList.remove('hidden');
+        });
+
+        installBtn?.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBtn.classList.add('hidden');
+            }
+            deferredPrompt = null;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            if (installBtn) installBtn.classList.add('hidden');
+        });
+
+        // Online / Offline Status Detection
+        function updateOnlineStatus() {
+            const statusEl = document.getElementById('connectionStatus');
+            if (navigator.onLine) {
+                statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Online`;
+            } else {
+                statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span> Offline`;
+            }
+        }
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        // --- 4. TABS & INTERACTION ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow');
+                btn.classList.add('bg-slate-900', 'text-slate-400');
+            });
+            const selectedTab = document.getElementById('tab-' + tabId);
+            if (selectedTab) {
+                selectedTab.classList.add('bg-indigo-600', 'text-white', 'shadow');
+                selectedTab.classList.remove('bg-slate-900', 'text-slate-400');
+            }
+
+            document.querySelectorAll('.query-panel').forEach(panel => panel.classList.add('hidden'));
+            const targetPanel = document.getElementById('panel-' + tabId);
+            if (targetPanel) targetPanel.classList.remove('hidden');
+        }
+
+        function clearOutput() {
+            document.getElementById('outputContainer').innerText = "Output telah dibersihkan.";
+        }
+
+        // --- 5. RUNNERS & INTEGRASI AI ---
+        async function geminiFetchWithBackoff(url, payload, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) return await response.json();
+                } catch (e) {}
+                await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+            }
+            throw new Error("Gagal menghubungi API setelah beberapa percobaan.");
+        }
+
+        async function generateNotebook(type) {
+            const topic = document.getElementById('courseTopic').value.trim();
+            const syllabus = document.getElementById('courseSyllabus').value.trim();
+            const outputContainer = document.getElementById('outputContainer');
+
+            if (!topic || !syllabus) {
+                outputContainer.innerText = "Mohon lengkapi Topik Pelajaran dan Silabus terlebih dahulu.";
+                return;
+            }
+
+            let prompt = "";
+            if (type === 'summary') {
+                prompt = `Buatlah Notebook Pelajaran terstruktur untuk mata kuliah "${topic}". Silabus/Materi: ${syllabus}. Format jawaban dalam Bahasa Indonesia yang ringkas dengan Peta Konsep, Poin Penting, dan Istilah Utama.`;
+            } else {
+                prompt = `Buatlah 3 Soal Kuis Pilihan Ganda beserta Jawaban dan Penjelasannya berdasarkan mata kuliah "${topic}" dan silabus: ${syllabus}.`;
+            }
+
+            try {
+                outputContainer.innerHTML = `<div class="text-indigo-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyusun Notebook Pelajaran...</div>`;
+                const response = await puter.ai.chat(prompt, { model: 'gemini-3-flash-preview' });
+                outputContainer.innerHTML = `<h3 class="font-bold text-indigo-300 mb-2">Notebook Pelajaran (${sanitizeText(topic)}):</h3><div>${sanitizeText(String(response)).replaceAll('\n', '<br>')}</div>`;
+            } catch (err) {
+                outputContainer.innerText = "Error: " + err.message;
+            }
+        }
+
+        async function runPuterQuery() {
+            const prompt = document.getElementById('promptInputPuter').value.trim();
+            const outputContainer = document.getElementById('outputContainer');
+            const submitBtn = document.getElementById('submitBtnPuter');
+            const model = document.getElementById('modelSelectPuter').value;
+            const stream = document.getElementById('streamToggle').checked;
+
+            if (!prompt) return;
+
+            try {
+                submitBtn.disabled = true;
+                outputContainer.innerHTML = `<div class="text-indigo-400 mb-2"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Mengirim Query Puter.ai...</div>`;
+
+                if (stream) {
+                    const responseStream = await puter.ai.chat(prompt, { model: model, stream: true });
+                    outputContainer.innerHTML = `<h3 class="font-bold text-indigo-300 mb-2">Respon (${model}):</h3>`;
+                    const contentDiv = document.createElement('div');
+                    outputContainer.appendChild(contentDiv);
+
+                    for await (const part of responseStream) {
+                        if (part?.text) {
+                            contentDiv.innerHTML += sanitizeText(part.text).replaceAll('\n', '<br>');
+                            outputContainer.scrollTop = outputContainer.scrollHeight;
+                        }
+                    }
+                } else {
+                    const response = await puter.ai.chat(prompt, { model: model });
+                    outputContainer.innerHTML = `<h3 class="font-bold text-indigo-300 mb-2">Respon (${model}):</h3><div>${sanitizeText(String(response)).replaceAll('\n', '<br>')}</div>`;
+                }
+            } catch (err) {
+                outputContainer.innerText = "Error: " + err.message;
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+        async function runGeminiTextQuery() {
+            const prompt = document.getElementById('promptInputGemini').value.trim();
+            const useSearch = document.getElementById('searchGroundingToggle').checked;
+            const outputContainer = document.getElementById('outputContainer');
+
+            if (!prompt) return;
+
+            try {
+                outputContainer.innerHTML = `<div class="text-emerald-400 mb-2"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memproses Gemini Search...</div>`;
+                const payload = { contents: [{ parts: [{ text: prompt }] }] };
+                if (useSearch) payload.tools = [{ "google_search": {} }];
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`;
+                const result = await geminiFetchWithBackoff(apiUrl, payload);
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    outputContainer.innerHTML = `<h3 class="font-bold text-emerald-300 mb-2">Hasil Gemini Search:</h3><div>${sanitizeText(text).replaceAll('\n', '<br>')}</div>`;
+                } else {
+                    outputContainer.innerText = "Tidak ada jawaban yang dikembalikan.";
+                }
+            } catch (err) {
+                outputContainer.innerText = "Error: " + err.message;
+            }
+        }
+
+        async function runGeminiJsonQuery() {
+            const prompt = document.getElementById('promptInputJson').value.trim();
+            const outputContainer = document.getElementById('outputContainer');
+
+            if (!prompt) return;
+
+            try {
+                outputContainer.innerHTML = `<div class="text-amber-400 mb-2"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memproses JSON...</div>`;
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: { "topik": { "type": "STRING" }, "deskripsi": { "type": "STRING" } }
+                            }
+                        }
+                    }
+                };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`;
+                const result = await geminiFetchWithBackoff(apiUrl, payload);
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (jsonText) {
+                    outputContainer.innerHTML = `<pre class="bg-slate-900 p-3 rounded text-xs text-amber-200">${sanitizeText(jsonText)}</pre>`;
+                }
+            } catch (err) {
+                outputContainer.innerText = "Error: " + err.message;
+            }
+        }
+
+        async function runGeminiVisionQuery() {
+            const prompt = document.getElementById('promptInputVision').value.trim();
+            const imageUrl = document.getElementById('imageUrlInput').value.trim();
+            const outputContainer = document.getElementById('outputContainer');
+
+            try {
+                outputContainer.innerHTML = `<div class="text-purple-400 mb-2"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Menganalisis Gambar...</div>`;
+                const response = await puter.ai.chat(prompt, imageUrl, { model: 'gemini-3.8-flash' });
+                outputContainer.innerHTML = `<h3 class="font-bold text-purple-300 mb-2">Hasil Analisis:</h3><div>${sanitizeText(String(response)).replaceAll('\n', '<br>')}</div>`;
+            } catch (err) {
+                outputContainer.innerText = "Error: " + err.message;
+            }
+        }
+
+        async function runGeminiTtsQuery() {
+            const prompt = document.getElementById('promptInputTts').value.trim();
+            const voice = document.getElementById('voiceSelect').value;
+            const outputContainer = document.getElementById('outputContainer');
+
+            try {
+                outputContainer.innerHTML = `<div class="text-rose-400 mb-2"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyintesis Suara...</div>`;
+                const audio = await puter.ai.txt2speech(prompt, { provider: "gemini", model: "gemini-2.5-flash-preview-tts", voice: voice });
+                outputContainer.innerHTML = `
+                    <h3 class="font-bold text-rose-300 mb-3">Hasil Suara Synthesized:</h3>
+                    <audio controls autoplay src="${audio.src || ''}" class="w-full"></audio>
+                `;
+            } catch (err) {
+                outputContainer.innerText = "Penyintesis suara selesai / membutuhkan koneksi langsung.";
+            }
+        }
+
+        async function runGeminiImageGenQuery() {
+            const prompt = document.getElementById('promptInputImageGen').value.trim();
+            const outputContainer = document.getElementById('outputContainer');
+
+            try {
+                outputContainer.innerHTML = `<div class="text-violet-400 mb-2"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Membuat Gambar...</div>`;
+                const payload = {
+                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                    generationConfig: { responseModalities: ['IMAGE'] }
+                };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=`;
+                const result = await geminiFetchWithBackoff(apiUrl, payload);
+                const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+
+                if (part) {
+                    const imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                    outputContainer.innerHTML = `<img src="${imageUrl}" class="max-h-[350px] rounded-lg shadow-xl mx-auto object-contain">`;
+                } else {
+                    outputContainer.innerText = "Gagal membuat gambar.";
+                }
+            } catch (err) {
+                outputContainer.innerText = "Error: " + err.message;
+            }
+        }
+    </script>
+</body>
+</html>
